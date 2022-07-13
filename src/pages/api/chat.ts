@@ -1,12 +1,14 @@
-import type { NextApiHandler } from "next";
 import type { NextApiRequest, NextApiResponse } from "next";
-
-import Pusher from "pusher";
 import Cors from "cors";
+
+// Initializing the cors middleware
+// You can read more about the available options here: https://github.com/expressjs/cors#configuration-options
 const cors = Cors({
   methods: ["POST", "GET", "HEAD"],
 });
 
+// Helper method to wait for a middleware to execute before continuing
+// And to throw an error when an error happens in a middleware
 function runMiddleware(
   req: NextApiRequest,
   res: NextApiResponse,
@@ -23,34 +25,6 @@ function runMiddleware(
   });
 }
 
-const config = {
-  pusher: {
-    app_id: "1435319",
-    key: "15ee77871e1ed5258044",
-    secret: "4c2b97bec11d18dc8a13",
-    cluster: "ap1",
-  },
-};
-
-const pusher = new Pusher({
-  appId: config.pusher.app_id,
-  key: config.pusher.key,
-  secret: config.pusher.secret,
-  cluster: config.pusher.cluster,
-  encrypted: true,
-});
-
-const chatHandler: NextApiHandler = async (request, response) => {
-  const { amount = 1 } = request.body;
-
-  // simulate IO latency
-  const payload = request.body;
-  pusher.trigger("chat", "message", payload);
-  response.send(payload);
-
-  response.json({ data: amount });
-};
-
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
@@ -61,5 +35,3 @@ export default async function handler(
   // Rest of the API logic
   res.json({ message: "Hello Everyone!" });
 }
-
-// export default handler;
