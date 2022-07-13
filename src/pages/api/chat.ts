@@ -5,7 +5,7 @@ const Pusher = require("pusher");
 // Initializing the cors middleware
 // You can read more about the available options here: https://github.com/expressjs/cors#configuration-options
 const cors = Cors({
-  methods: ["POST", "GET", "HEAD"],
+  methods: ["POST", "GET", "HEAD", "PUT"],
 });
 
 const config = {
@@ -67,10 +67,10 @@ export default async function handler(
       const payload = req.body;
       pusher.trigger("chat", "message", payload);
       res.send(payload);
-      res.status(200).json({ id, name: name || `User ${id}` });
+      // res.json({ message: "success!" });
       break;
     default:
-      res.setHeader("Allow", ["GET", "PUT"]);
+      res.setHeader("Allow", ["GET", "PUT", "POST"]);
       res.status(405).end(`Method ${method} Not Allowed`);
   }
 }
