@@ -1,10 +1,28 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import Cors from "cors";
+const Pusher = require("pusher");
 
 // Initializing the cors middleware
 // You can read more about the available options here: https://github.com/expressjs/cors#configuration-options
 const cors = Cors({
   methods: ["POST", "GET", "HEAD"],
+});
+
+const config = {
+  pusher: {
+    app_id: "1435319",
+    key: "15ee77871e1ed5258044",
+    secret: "4c2b97bec11d18dc8a13",
+    cluster: "ap1",
+  },
+};
+
+const pusher = new Pusher({
+  appId: config.pusher.app_id,
+  key: config.pusher.key,
+  secret: config.pusher.secret,
+  cluster: config.pusher.cluster,
+  encrypted: true,
 });
 
 // Helper method to wait for a middleware to execute before continuing
@@ -33,5 +51,26 @@ export default async function handler(
   await runMiddleware(req, res, cors);
 
   // Rest of the API logic
-  res.json({ message: "Hello Everyone!" });
+  const {
+    query: { id, name },
+    method,
+  } = req;
+
+  switch (method) {
+    case "GET":
+      // Get data from your database
+      // res.status(200).json({ id, name: `User ${id}` })
+      res.json({ message: "Hello Everyone!" });
+      break;
+    case "POST":
+      // Update or create data in your database
+      const payload = req.body;
+      pusher.trigger("chat", "message", payload);
+      res.send(payload);
+      res.status(200).json({ id, name: name || `User ${id}` });
+      break;
+    default:
+      res.setHeader("Allow", ["GET", "PUT"]);
+      res.status(405).end(`Method ${method} Not Allowed`);
+  }
 }
