@@ -65,9 +65,10 @@ export default async function handler(
     case "POST":
       // Update or create data in your database
       const payload = req.body;
+      console.log("----------", payload);
       pusher.trigger("chat", "message", payload);
-      res.send(payload);
-      // res.json({ message: "success!" });
+      // res.send(payload);
+      res.json({ message: payload });
       break;
     default:
       res.setHeader("Allow", ["GET", "PUT", "POST"]);
